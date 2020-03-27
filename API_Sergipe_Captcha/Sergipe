@@ -1,0 +1,116 @@
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+from flask import Flask, escape, request, jsonify
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+from PIL import Image
+import urllib.request
+import urllib
+import time
+import os
+
+os.environ["LANG"] = "iso8859-1"
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('headless')
+siteLink = 'https://security.sefaz.se.gov.br/SIC/sintegra/index.jsp'
+loadImages = '<base href="https://security.sefaz.se.gov.br/SIC/sintegra/">'
+
+captchaWord = {
+    1:'polish', 2:'past', 3:'part', 4:'when', 5:'much', 6:'seed',
+    7:'soap', 8:'glove', 9:'sticky', 10:'soap', 11:'profit',12:'bent', 
+    13:'collar', 14:'where', 15:'weight', 16:'again',17:'weight',18:'boat',
+    19:'small', 20:'profit', 21:'sound', 22:'chin',23:'flag',24:'body',
+    25:'salt', 26:'birth', 27:'crime', 28:'false', 29:'sleep',30:'square',
+    31:'canvas', 32:'mine', 33:'safe',34:'mark',35:'degree',36:'bell',
+    37:'color', 38:'expert', 39:'rule', 40:'parcel', 41:'degree', 42:'waste',
+    43:'after', 44:'army',45:'moon',46:'brain',47:'news',48:'silver',
+    49:'rain', 50:'stiff', 51:'horse', 52:'smile',53:'shirt', 54:'this',
+    55:'grip', 56:'sharp', 57:'knot', 58:'neck', 59:'woman', 60:'smell',
+    61:'round', 62:'linen', 63:'same', 64:'right', 65:'adjust',66:'jewel', 
+    67:'bell', 68:'pocket', 69:'green', 70:'mother',71:'mine',72:'rice',
+    73:'loss', 74:'tail', 75:'foot', 76:'porter',77:'spring', 78:'desire', 
+    79:'screw', 80:'spade', 81:'bent', 82:'letter', 83:'glass', 84:'sugar',
+    85:'fear', 86:'every', 87:'muscle', 88:'right',   89:'rate', 90:'butter',
+    91:'sail', 92:'summer', 93:'snake', 94:'wheel',95:'sheep',96:'glove',
+    97:'poison', 98:'tooth', 99:'bucket', 100:'wood',101:'great',102:'school',
+    103:'sudden', 104:'wind', 105:'step',106:'credit',107:'pain',108:'design',
+    109:'front', 110:'push', 111:'seem',112:'cord',113:'sound',114:'scale',
+    115:'with', 116:'wind', 117:'cloth',118:'screw',119:'gorden',120:'west',
+    121:'judge', 122:'goat', 123:'animal',124:'warm',125:'join',126:'turn',
+    127:'school', 128:'white',129:'keep',130:'basin',131:'tooth',132:'face',
+    133:'range', 134:'tight', 135:'nail',136:'seem', 137:'female', 138:'public',
+    139:'potato', 140:'idea', 141:'snake',142:'flower', 143:'narrow', 144:'still',
+    145:'hope', 146:'glass', 147:'lock', 148:'hand', 149:'face', 150:'fear',
+    151:'copper', 152:'debt',153:'shoe', 154:'paint', 155:'butter',156:'roll', 
+    157:'blood', 158:'story', 159:'doubt', 160:'meat', 161:'offer',162:'clean',
+    163:'memory', 164:'like', 165:'wrong', 166:'jump',167:'amount',168:'regret',
+    169:'free', 170:'crush', 171:'pull', 172:'dress',173:'door',174:'male',
+    175:'black', 176:'please',177:'flag', 178:'fact', 179:'nose', 180:'taste',
+    181:'snake', 182:'cold',183:'attack',184:'crush',185:'canvas',186:'shame',
+    187:'book', 188:'wound', 189:'nation', 190:'fire', 191:'good',
+}
+
+def removeDot(numberWithDot):
+    numberWithoutDot = ''
+    for eachCharacter in numberWithDot:
+        if eachCharacter == '.':
+            break
+        else:
+            numberWithoutDot += eachCharacter
+    numberWithoutDot = int(numberWithoutDot)
+    return captchaWord[numberWithoutDot]
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if (request.method == 'POST'):
+        some_json = request.get_json()
+        return jsonify({'you sent': some_json}), 201
+    else:
+        return '''<h1 align = "center">WELCOME TO THIS PAGE!</h1>'''
+
+@app.route('/cnpj/<string:numberCnpj>', methods=['GET'])
+def getCnpj(numberCnpj):
+    go = webdriver.Chrome(chrome_options=chrome_options)
+    go.get(siteLink)
+    time.sleep(0.5)
+    go.find_element_by_name('cdCnpj').send_keys(numberCnpj)
+    imgUrl = go.find_element_by_xpath('/html/body/div[2]/center/table/tbody/tr/td/font/form/table[2]/tbody/tr[3]/td[2]/div/img').get_attribute("src")
+    numberWithDot = imgUrl[51:]
+    go.find_element_by_name('dsImagem').send_keys(removeDot(numberWithDot))
+    go.find_element_by_name('enviarCgc').click()
+    return loadImages + go.page_source
+
+@app.route('/cpf/<string:numberCpf>', methods=['GET'])
+def getCpf(numberCpf):
+    go = webdriver.Chrome(chrome_options=chrome_options)
+    go.get(siteLink)
+    time.sleep(0.5)
+    go.find_element_by_name('cdCnpj').send_keys(numberCpf)
+    imgUrl = go.find_element_by_xpath('/html/body/div[2]/center/table/tbody/tr/td/font/form/table[2]/tbody/tr[3]/td[2]/div/img').get_attribute("src")
+    numberWithDot = imgUrl[51:]
+    go.find_element_by_name('dsImagem').send_keys(removeDot(numberWithDot))
+    go.find_element_by_name('enviarCgc').click()
+    return loadImages + go.page_source
+
+@app.route('/ie/<string:numberIe>', methods=['GET'])
+def getIe(numberIe):
+    go = webdriver.Chrome(chrome_options=chrome_options)
+    go.get(siteLink)
+    time.sleep(0.5)
+    go.find_element_by_name('cdPessoaContribuinte').send_keys(numberIe)
+    imgUrl = go.find_element_by_xpath('/html/body/div[2]/center/table/tbody/tr/td/font/form/table[2]/tbody/tr[3]/td[2]/div/img').get_attribute("src")
+    numberWithDot = imgUrl[51:]
+    go.find_element_by_name('dsImagem').send_keys(removeDot(numberWithDot))
+    go.find_element_by_name('enviarIe').click()
+    return loadImages + go.page_source
+
+def main():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="10.20.20.127", port=port)
+    
+if __name__ == '__main__':
+    main()
