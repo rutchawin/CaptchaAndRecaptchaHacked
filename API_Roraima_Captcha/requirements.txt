@@ -134,7 +134,7 @@ soupsieve==1.9.5
 SpeechRecognition==3.8.1
 sqlparse==0.3.0
 tb-nightly==2.2.0a20200211
-tensorflow==0.12.0
+tensorflow==1.15.2
 termcolor==1.1.0
 terminado==0.8.3
 tesseract==0.1.3
