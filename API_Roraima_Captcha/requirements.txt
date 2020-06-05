@@ -24,7 +24,7 @@ crayons==0.3.0
 Cython==0.29.15
 decorator==4.4.1
 defusedxml==0.6.0
-Django==3.0.3
+Django==3.0.7
 djangorestframework==3.11.0
 EasyProcess==0.2.10
 Eel==0.12.2
