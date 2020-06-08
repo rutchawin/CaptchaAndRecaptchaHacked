@@ -31,7 +31,6 @@ Instala apenas os packages que são usados em ambiente de desenvolvimento.
 pipenv install --dev
 
 ```
-**NÃO UTILIZA O AZcaptcha, possui solução própria através de uma vulnerabilidade encontrada na fonte**
 
 ## REQUESTs CNPJ
 
